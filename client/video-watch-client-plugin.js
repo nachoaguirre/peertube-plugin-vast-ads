@@ -1,6 +1,7 @@
 import {
   settings,
   loadContribAds,
+  mergeVideoDataWithPluginSettings,
   getRollsStatus,
   createVastSettings,
   buildVastPlayer
@@ -35,18 +36,26 @@ async function init (registerHook, peertubeHelpers) {
   registerHook({
     target: 'action:video-watch.player.loaded',
     handler: async ({ videojs, player, video }) => {
-      if (!rollsStatus.hasAtLeastOneRollEnabled) return;
+      if (!rollsStatus.hasAtLeastOneRollEnabled) {
+        let videoRollStatus = getRollsStatus(video?.pluginData?.vastVideo);
+        if (!videoRollStatus.hasAtLeastOneRollEnabled) return;
+      }
 
       window.videojs = videojs;
       window.player = player;
 
-      console.log('[VAST PLUGIN] Player loaded pluginData', video?.pluginData);
-      console.log('[VAST PLUGIN] Player loaded', video);
+      console.log('[VAST PLUGIN] Player loaded pluginData', video?.pluginData?.vastVideo);
+      console.log('[VAST PLUGIN] pluginSettings', pluginSettings);
+
+      const videoPluginData = video?.pluginData?.vastVideo;
+      let configData = getRollsStatus(videoPluginData).hasAtLeastOneRollEnabled ? mergeVideoDataWithPluginSettings(videoPluginData, pluginSettings) : pluginSettings;
+
+      console.log('[VAST PLUGIN] CONFIG FINAAAAL', configData);
 
       await loadContribAds(player);
 
       try {
-        const vastSettings = createVastSettings(pluginSettings);
+        const vastSettings = createVastSettings(configData);
         await buildVastPlayer(vastSettings, player);
       } catch (error) {
         console.error('[VAST PLUGIN] Error:', error);

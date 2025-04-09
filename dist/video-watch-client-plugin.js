@@ -2821,15 +2821,31 @@ var loadContribAds = async (player) => {
   }
 };
 var getRollsStatus = (pluginSettings) => {
-  const isRollEnabled = (roll) => roll.url && roll.enabled;
+  const isRollEnabled = (roll) => (roll == null ? void 0 : roll.url) && (roll == null ? void 0 : roll.enabled);
   const rolls = {
-    preroll: isRollEnabled(pluginSettings.preroll),
-    midroll: isRollEnabled(pluginSettings.midroll),
-    postroll: isRollEnabled(pluginSettings.postroll)
+    preroll: isRollEnabled(pluginSettings == null ? void 0 : pluginSettings.preroll),
+    midroll: isRollEnabled(pluginSettings == null ? void 0 : pluginSettings.midroll),
+    postroll: isRollEnabled(pluginSettings == null ? void 0 : pluginSettings.postroll)
   };
   return __spreadProps(__spreadValues({}, rolls), {
     hasAtLeastOneRollEnabled: Object.values(rolls).some(Boolean)
   });
+};
+var mergeVideoDataWithPluginSettings = (videoPluginData, pluginSettings) => {
+  if (!videoPluginData) {
+    return pluginSettings;
+  }
+  const updatedConfig = __spreadValues({}, pluginSettings);
+  for (const category in videoPluginData) {
+    if (Object.prototype.hasOwnProperty.call(videoPluginData, category)) {
+      if (updatedConfig[category]) {
+        updatedConfig[category] = __spreadValues(__spreadValues({}, updatedConfig[category]), videoPluginData[category]);
+      } else {
+        updatedConfig[category] = __spreadValues({}, videoPluginData[category]);
+      }
+    }
+  }
+  return updatedConfig;
 };
 var createVastSettings = (pluginSettings) => {
   const { skipTime, controlsEnabled, messageSkip, messageSkipCountdown, messageRemainingTime } = pluginSettings;
@@ -2903,15 +2919,22 @@ async function init(registerHook, peertubeHelpers) {
   registerHook({
     target: "action:video-watch.player.loaded",
     handler: async ({ videojs: videojs2, player, video }) => {
-      if (!rollsStatus.hasAtLeastOneRollEnabled)
-        return;
+      var _a, _b, _c;
+      if (!rollsStatus.hasAtLeastOneRollEnabled) {
+        let videoRollStatus = getRollsStatus((_a = video == null ? void 0 : video.pluginData) == null ? void 0 : _a.vastVideo);
+        if (!videoRollStatus.hasAtLeastOneRollEnabled)
+          return;
+      }
       window.videojs = videojs2;
       window.player = player;
-      console.log("[VAST PLUGIN] Player loaded pluginData", video == null ? void 0 : video.pluginData);
-      console.log("[VAST PLUGIN] Player loaded", video);
+      console.log("[VAST PLUGIN] Player loaded pluginData", (_b = video == null ? void 0 : video.pluginData) == null ? void 0 : _b.vastVideo);
+      console.log("[VAST PLUGIN] pluginSettings", pluginSettings);
+      const videoPluginData = (_c = video == null ? void 0 : video.pluginData) == null ? void 0 : _c.vastVideo;
+      let configData = getRollsStatus(videoPluginData).hasAtLeastOneRollEnabled ? mergeVideoDataWithPluginSettings(videoPluginData, pluginSettings) : pluginSettings;
+      console.log("[VAST PLUGIN] CONFIG FINAAAAL", configData);
       await loadContribAds(player);
       try {
-        const vastSettings = createVastSettings(pluginSettings);
+        const vastSettings = createVastSettings(configData);
         await buildVastPlayer(vastSettings, player);
       } catch (error) {
         console.error("[VAST PLUGIN] Error:", error);

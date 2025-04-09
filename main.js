@@ -15,13 +15,38 @@ async function register ({
 
   registerHook({
     target: 'action:api.video.updated',
-    handler: ({ video, req }) => {
+    handler: async ({ video, req }) => {
       if (!req.body.pluginData) return
 
-      const value = req.body.pluginData[storageFieldName]
-      if (!value) return
+      const pluginData = req.body.pluginData;
+      const transformedData = {}
 
-      storageManager.storeData(storageFieldName + '-' + video.id, value)
+      if (pluginData['vast-video-preroll-enabled'] === 'true' && pluginData['vast-video-preroll-url']) {
+        transformedData.preroll = {
+          enabled: true,
+          url: pluginData['vast-video-preroll-url']
+        };
+      }
+
+      if (pluginData['vast-video-midroll-enabled'] === 'true' && pluginData['vast-video-midroll-url']) {
+        transformedData.midroll = {
+          enabled: true,
+          url: pluginData['vast-video-midroll-url'],
+          offset: pluginData['vast-video-midroll-offset'] || '25%'
+        };
+      }
+
+      if (pluginData['vast-video-postroll-enabled'] === 'true' && pluginData['vast-video-postroll-url']) {
+        transformedData.postroll = {
+          enabled: true,
+          url: pluginData['vast-video-postroll-url']
+        };
+      }
+
+      if (Object.keys(transformedData).length > 0) {
+        const value = JSON.stringify(transformedData);
+        await storageManager.storeData(storageFieldName + '-' + video.id, value);
+      }
     }
   })
 
@@ -31,8 +56,8 @@ async function register ({
       if (!video) return video
       if (!video.pluginData) video.pluginData = {}
 
-      const result = await storageManager.getData(fieldName + '-' + video.id)
-      video.pluginData[fieldName] = result
+      const result = await storageManager.getData(storageFieldName + '-' + video.id)
+      video.pluginData[storageFieldName] = result
 
       return video
     }
