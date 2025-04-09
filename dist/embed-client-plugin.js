@@ -2821,11 +2821,11 @@ var loadContribAds = async (player) => {
   }
 };
 var getRollsStatus = (pluginSettings2) => {
-  const isRollEnabled = (roll) => roll.url && roll.enabled;
+  const isRollEnabled = (roll) => (roll == null ? void 0 : roll.url) && (roll == null ? void 0 : roll.enabled);
   const rolls = {
-    preroll: isRollEnabled(pluginSettings2.preroll),
-    midroll: isRollEnabled(pluginSettings2.midroll),
-    postroll: isRollEnabled(pluginSettings2.postroll)
+    preroll: isRollEnabled(pluginSettings2 == null ? void 0 : pluginSettings2.preroll),
+    midroll: isRollEnabled(pluginSettings2 == null ? void 0 : pluginSettings2.midroll),
+    postroll: isRollEnabled(pluginSettings2 == null ? void 0 : pluginSettings2.postroll)
   };
   return __spreadProps(__spreadValues({}, rolls), {
     hasAtLeastOneRollEnabled: Object.values(rolls).some(Boolean)
