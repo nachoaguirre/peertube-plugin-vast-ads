@@ -2907,6 +2907,8 @@ async function init(registerHook, peertubeHelpers) {
         return;
       window.videojs = videojs2;
       window.player = player;
+      console.log("[VAST PLUGIN] Player loaded pluginData", video == null ? void 0 : video.pluginData);
+      console.log("[VAST PLUGIN] Player loaded", video);
       await loadContribAds(player);
       try {
         const vastSettings = createVastSettings(pluginSettings);

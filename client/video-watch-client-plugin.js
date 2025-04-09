@@ -40,6 +40,9 @@ async function init (registerHook, peertubeHelpers) {
       window.videojs = videojs;
       window.player = player;
 
+      console.log('[VAST PLUGIN] Player loaded pluginData', video?.pluginData);
+      console.log('[VAST PLUGIN] Player loaded', video);
+
       await loadContribAds(player);
 
       try {
