@@ -24,6 +24,12 @@
       ]
     },
     {
+      "script": "client/video-edit-client-plugin.js",
+      "scopes": [
+        "video-edit"
+      ]
+    },
+    {
       "script": "dist/embed-client-plugin.js",
       "scopes": [
         "embed"

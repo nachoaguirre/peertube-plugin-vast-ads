@@ -5,6 +5,7 @@ const { externalGlobalPlugin } = require('esbuild-plugin-external-global')
 const clientFiles = [
   'video-watch-client-plugin.js',
   'embed-client-plugin.js',
+  'video-edit-client-plugin.js',
 ]
 
 const configs = clientFiles.map(f => ({
