@@ -1,11 +1,11 @@
 {
-  "name": "peertube-plugin-vast-ads",
-  "description": "Display vast ads in peertube",
+  "name": "peertube-plugin-wigowigo-vast-ads",
+  "description": "Display vast ads in Wigowigo peertube",
   "version": "1.0.0",
   "license": "BSD-3-Clause",
   "author": "Ignacio Aguirre",
-  "bugs": "https://github.com/nachoaguirre/peertube-plugin-vast-ads/issues",
-  "homepage": "https://github.com/nachoaguirre/peertube-plugin-vast-ads",
+  "bugs": "https://github.com/ngobyalincolnisaac/peertube-plugin-vast-ads/issues",
+  "homepage": "https://github.com/ngobyalincolnisaac/peertube-plugin-vast-ads",
   "keywords": [
     "peertube",
     "plugin",
